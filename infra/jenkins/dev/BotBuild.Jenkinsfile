@@ -18,7 +18,7 @@ pipeline {
                 // TODO dev bot build stage
                 sh '''
                 echo "building..."
-                aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin $REGISTRY_URL
+                aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin $REGISTRY_URL
                 docker build -t $IMAGE_NAME:$BUILD_NUMBER -f bot/Dockerfile .
                 docker tag $IMAGE_NAME:$BUILD_NUMBER $REGISTRY_URL/$IMAGE_NAME:$BUILD_NUMBER
                 docker push $REGISTRY_URL/$IMAGE_NAME:$BUILD_NUMBER
