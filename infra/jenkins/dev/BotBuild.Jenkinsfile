@@ -7,7 +7,7 @@ pipeline {
     }
     environment {
     REGISTRY_URL = '700935310038.dkr.ecr.eu-north-1.amazonaws.com'
-    IMAGE_NAME = 'of1r-prod-jenkins-agent'
+    IMAGE_NAME = 'of1r-bot-dev'
     IMAGE_TAG = '${BUILD_NUMBER}'
 
     }
