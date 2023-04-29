@@ -7,7 +7,7 @@ pipeline {
     }
     environment {
     REGISTRY_URL = '700935310038.dkr.ecr.eu-north-1.amazonaws.com'
-    IMAGE_NAME = 'of1r-prod-jenkins-agent'
+    IMAGE_NAME = 'of1r-bot-dev'
     IMAGE_TAG = '${BUILD_NUMBER}'
 
     }
@@ -16,6 +16,7 @@ pipeline {
         stage('Build') {
             steps {
                 // TODO dev bot build stage
+                // 'building' message for testing
                 sh '''
                 echo "building..."
                 aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin $REGISTRY_URL
