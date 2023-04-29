@@ -5,37 +5,48 @@ pipeline {
             args  '--user root -v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
-    environment {
-    REGISTRY_URL = '700935310038.dkr.ecr.eu-north-1.amazonaws.com'
-    IMAGE_NAME = 'of1r-bot-dev'
-    IMAGE_TAG = '${BUILD_NUMBER}'
 
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+        timestamps()
+    }
+
+    environment {
+        IMAGE_NAME = 'of1r-bot-dev'
+        IMAGE_TAG = "${GIT_COMMIT}"
+        REPO_URL = '7700935310038.dkr.ecr.eu-north-1.amazonaws.com'
     }
 
     stages {
-        stage('Build') {
+        stage('ECR Login') {
             steps {
-                // TODO dev bot build stage
-                // 'building' message for testing
-                sh '''
-                echo "building..."
-                aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin $REGISTRY_URL
-                docker build -t $IMAGE_NAME:$BUILD_NUMBER -f bot/Dockerfile .
-                docker tag $IMAGE_NAME:$BUILD_NUMBER $REGISTRY_URL/$IMAGE_NAME:$BUILD_NUMBER
-                docker push $REGISTRY_URL/$IMAGE_NAME:$BUILD_NUMBER
-                '''
+                sh 'aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 7700935310038.dkr.ecr.eu-north-1.amazonaws.com'
             }
-            post {
-                always{
-                    sh 'docker image prune -a --filter "until=240" --force'
-                }
+        }
+        stage('Image Build') {
+            steps {
+                sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f bot/Dockerfile ."
             }
         }
 
+
+        stage('Image Push') {
+            steps {
+                sh "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${REPO_URL}/${IMAGE_NAME}:${IMAGE_TAG}"
+                sh "docker push ${REPO_URL}/${IMAGE_NAME}:${IMAGE_TAG}"
+            }
+            post {
+                    always {
+                        sh 'docker image prune -a --filter "until=64h" --force'
+                    }
+                }
+        }
+
+
         stage('Trigger Deploy') {
             steps {
-                build job: 'BotDeploy', wait: false, parameters: [
-                    string(name: 'BOT_IMAGE_NAME', value: "$REGISTRY_URL/$IMAGE_NAME:$BUILD_NUMBER")
+                build job: 'botDeploy', wait: false, parameters: [
+                    string(name: 'BOT_IMAGE_NAME', value: "${REPO_URL}/${IMAGE_NAME}:${IMAGE_TAG}"),
                 ]
             }
         }
