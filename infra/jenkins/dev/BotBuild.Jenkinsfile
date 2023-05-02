@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image '700935310038.dkr.ecr.eu-north-1.amazonaws.com/of1r-prod-jenkins-agent:latest'
+            image '700935310038.dkr.ecr.eu-north-1.amazonaws.com/of1r-jenkinsagent:1'
             args  '--user root -v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
@@ -13,7 +13,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = 'of1r-bot-dev'
-        IMAGE_TAG = "${GIT_COMMIT}"
+        IMAGE_TAG = "${BUILD_NUMBER}"
         REPO_URL = '7700935310038.dkr.ecr.eu-north-1.amazonaws.com'
     }
 
