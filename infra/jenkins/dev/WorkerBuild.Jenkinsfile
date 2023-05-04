@@ -2,12 +2,12 @@ pipeline {
     agent {
         docker {
             // TODO build & push your Jenkins agent image, place the URL here
-            image '700935310038.dkr.ecr.eu-north-1.amazonaws.com/of1r-prod-jenkins-agent:latest'
+            image '700935310038.dkr.ecr.eu-north-1.amazonaws.com/of1r-jenkinsagent:1'
             args  '--user root -v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
     environment {
-    REGISTRY_URL = '700935310038.dkr.ecr.us-west-2.amazonaws.com'
+    REGISTRY_URL = '700935310038.dkr.ecr.eu-north-1.amazonaws.com'
     IMAGE_NAME = 'of1r-worker-dev'
     IMAGE_TAG = '${BUILD_NUMBER}'
 
