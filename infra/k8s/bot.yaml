@@ -1,20 +1,32 @@
-# TODO implement the kubernetes manifest here
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: BotApp
+  name: bot-deployment
+  labels:
+    app: bot
+    env:
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: BotApp
+      app: bot
+      env:
   template:
     metadata:
       labels:
-        app: BotApp
+        app: bot
+        env:
     spec:
       containers:
-      - name: BotApp
+      - name: bot
         image:
-        ports:
-        - containerPort: 80
+        env:
+          - name: ENV
+            value:
+        resources:
+          requests:
+            memory: "200Mi"
+            cpu: "200m"
+          limits:
+            memory: "200Mi"
+            cpu: "200m"
