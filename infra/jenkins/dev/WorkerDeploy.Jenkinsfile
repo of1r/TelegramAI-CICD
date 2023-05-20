@@ -8,28 +8,35 @@ pipeline {
     }
 
     environment {
+        //for the k8s_deployment_yaml_customize.py script
+        APP_NAME = "worker"
         APP_ENV = "dev"
+        K8S_DEPLOYMENT_FILE = "infra/k8s/worker_to_deploy.yaml"
+        K8S_YAML_TO_EDIT = "infra/k8s/worker.yaml"
     }
 
     parameters {
         string(name: 'WORKER_IMAGE_NAME')
     }
 
-    stages {
-        stage('yaml preparation'){
+        stages {
+
+        stage('Deployment File Creation') {
             steps{
-                sh "sed 's|dynamic_worker_image|$WORKER_IMAGE_NAME|g; s|env_to_replace|$APP_ENV|g' infra/k8s/worker.yaml > infra/k8s/worker_deploy.yaml"
+                sh 'pip3 install pyyaml'
+                sh 'python3 scripts/k8s_deployment_yaml_customize.py'
             }
         }
 
-        stage('worker Deploy') {
+
+        stage('Bot Deploy') {
             steps {
                 withCredentials([
                     file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')
                 ]) {
                     sh '''
                     # apply the configurations to k8s cluster
-                    kubectl apply --kubeconfig ${KUBECONFIG} -f infra/k8s/worker_deploy.yaml -n dev
+                    kubectl apply --kubeconfig ${KUBECONFIG} -f ${K8S_DEPLOYMENT_FILE} -n dev
                     '''
                 }
             }
