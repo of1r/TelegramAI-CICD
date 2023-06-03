@@ -15,21 +15,28 @@ pipeline {
         string(name: 'WORKER_IMAGE_NAME')
     }
 
-    stages {
-        stage('yaml preparation'){
-            steps{
-                sh "sed 's|dynamic_worker_image|$WORKER_IMAGE_NAME|g; s|env_to_replace|$APP_ENV|g' infra/k8s/worker.yaml > infra/k8s/worker_deploy.yaml"
+
+   stages {
+
+        stage('yaml build'){
+            steps {
+                sh "sed -i 's|WORKER_IMAGE|$WORKER_IMAGE_NAME|g' infra/k8s/worker.yaml"
+
             }
         }
-
-        stage('worker Deploy') {
+        stage('Bot Deploy') {
             steps {
+
                 withCredentials([
                     file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')
                 ]) {
+
                     sh '''
+
                     # apply the configurations to k8s cluster
-                    kubectl apply --kubeconfig ${KUBECONFIG} -f infra/k8s/worker_deploy.yaml -n dev
+
+                     kubectl apply --kubeconfig ${KUBECONFIG} -f infra/k8s/worker.yaml --namespace dev
+
                     '''
                 }
             }
