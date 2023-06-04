@@ -24,7 +24,7 @@ pipeline {
 
             }
         }
-        stage('Bot Deploy') {
+        stage('Worker Deploy') {
             steps {
 
                 withCredentials([
