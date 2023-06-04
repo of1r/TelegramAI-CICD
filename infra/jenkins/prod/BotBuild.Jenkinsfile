@@ -8,22 +8,20 @@ pipeline {
     }
 
     options {
-        timestamps()
         timeout(time: 30, unit: 'MINUTES')
-
+        timestamps()
     }
+
     environment {
         IMAGE_NAME = 'of1r-bot-prod'
         IMAGE_TAG = "${BUILD_NUMBER}"
         REPO_URL = '700935310038.dkr.ecr.eu-north-1.amazonaws.com'
     }
 
-  stages {
+    stages {
         stage('ECR Login') {
-
             steps {
-
-                sh 'aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 700935310038.dkr.ecr.eu-north-1.amazonaws.com'
+                sh 'aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 700935310038.dkr.ecr.eu-north-1.amazonaws.com'
             }
         }
         stage('Image Build') {
@@ -31,6 +29,7 @@ pipeline {
                 sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f bot/Dockerfile ."
             }
         }
+
 
         stage('Image Push') {
             steps {
